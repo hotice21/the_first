@@ -1,0 +1,1 @@
+{"hub": [{"device": "light", "id": "L3", "name": "bedroom light", "energy_usage": 5, "brightness": 80}, {"id": "L1", "name": "bathroom light", "device": "light", "energy_usage": 45, "brightness": 200}, {"device": "light", "id": "L2", "name": "living room light", "energy_usage": 10, "brightness": 200}]}
