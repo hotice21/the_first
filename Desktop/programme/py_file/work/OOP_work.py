@@ -104,8 +104,8 @@ class DeviceController:
             if device=="device":
                 self.devices[_id]=Device(device_id=_id,name=info_device["name"],energy_usage=eu)
             elif device=="fridge":
-                h_t=info_device["high_temperature"]
-                l_t=info_device["low_temperature"]
+                h_t=info_device["high_temperature"] if "high_temperature" in info_device else 5
+                l_t=info_device["low_temperature"] if "low_temperature" in info_device else -10
                 s_s=info_device["stage_status"]
                 self.devices[_id] = Fridge(device_id=_id, name=info_device["name"], energy_usage=eu,high_t=h_t,low_t=l_t,stage_status=s_s)
             elif device=="camera":
@@ -118,7 +118,7 @@ class DeviceController:
                 tem=info_device["temperature"] if 'temperature' in info_device else 22
                 self.devices[_id] = Thermostat(device_id=_id, name=info_device["name"], energy_usage=eu,temperature=tem)
             else:
-                return Exception("this device is not exist")
+                return Exception("this device is not exist ")
             return f"{device}:{info_device['name']} id:{_id} has been adding"
         except Exception as e:
             return str(e)+"\nfail to add device"
@@ -159,6 +159,7 @@ class SmartHomeHub:
         sum_status=""
         for device in self.controller.devices.values():
             sum_status+=f"{device.get_name()}:{device.get_status()}"
+        return sum_status
     #return the total of all energy usage
     def total_energy_usage(self):
         total_usage=0
