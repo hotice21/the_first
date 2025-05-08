@@ -89,9 +89,11 @@ def schedule():
     return 'finish covering'
 def auto_switch():
     try:
+        global check
         if check:
             with open('time.json', 'r') as f:
                 data_time = json.load(f)
+            check=False
         now=time.strftime('%H:%M',time.localtime(time.time()))
         if isinstance(data_time,dict):
             for dt in data_time.keys():
