@@ -6,6 +6,7 @@ import multiprocessing
 app=Flask(__name__)
 hub=SmartHomeHub()
 data='data.json'
+check=False
 #api
 @app.route('/add',methods=['POST'])
 def add_device():
@@ -79,6 +80,8 @@ def total_energy_usage():
     return str(hub.total_energy_usage())
 @app.route('/schedule',methods=['POST'])
 def schedule():
+    global check
+    check=True
     total=request.get_json()
     for t,di in total.items():
         for _id,command in di.items():
@@ -86,8 +89,9 @@ def schedule():
     return 'finish covering'
 def auto_switch():
     try:
-        with open('time.json', 'r') as f:
-            data_time = json.load(f)
+        if check:
+            with open('time.json', 'r') as f:
+                data_time = json.load(f)
         now=time.strftime('%H:%M',time.localtime(time.time()))
         if isinstance(data_time,dict):
             for dt in data_time.keys():
