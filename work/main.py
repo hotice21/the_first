@@ -1,6 +1,7 @@
 from OOP_work import *
 from flask import *
-import os,json,shutil
+import os,json,shutil,time
+import multiprocessing
 #init
 app=Flask(__name__)
 hub=SmartHomeHub()
@@ -76,6 +77,26 @@ def display_status():
 @app.route('/total_energy_usage',methods=['GET'])
 def total_energy_usage():
     return str(hub.total_energy_usage())
+@app.route('/schedule',methods=['POST'])
+def schedule():
+    total=request.get_json()
+    for t,di in total.items():
+        for _id,command in di.items():
+            hub.schedule_task(device_id=_id,command=command,time=t)
+    return 'finish covering'
+def auto_switch():
+    try:
+        with open('time.json', 'r') as f:
+            data_time = json.load(f)
+        now=time.strftime('%H:%M',time.localtime(time.time()))
+        if isinstance(data_time,dict):
+            for dt in data_time.keys():
+                if now==dt:
+                    for _id,command in data_time[now].items():
+                        hub.controller.execute_command(_id,command)
+        time.sleep(60)
+    except Exception as e:
+        return str(e)
 if __name__=='__main__':
     #copying
     shutil.copy(data,"./old data/")
@@ -89,4 +110,5 @@ if __name__=='__main__':
             for d in datas["hub"]:
                 hub.controller.add_device(d)
     #run
+    _auto_switch=multiprocessing.Process(target=auto_switch)
     app.run(debug=True)

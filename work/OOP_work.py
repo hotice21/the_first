@@ -1,5 +1,9 @@
-import abc
+import abc,os
+import json
 from datetime import datetime
+from json import JSONDecodeError
+
+
 class Device(abc.ABC):
     def __init__(self, device_id, name, energy_usage=0):
         self._device_id = device_id
@@ -153,7 +157,21 @@ class SmartHomeHub:
         return cls._instance
     #if the datetime is the same to the given time, switch the device
     def schedule_task(self, device_id, command, time):
-        pass
+        try:
+            if device_id not in self.controller.devices:
+                raise Exception("this id is not exist")
+            if not os.path.exists("time.json"):
+                with open("time.json","w") as f:
+                    json.dump({time:{device_id:command}},f)
+            else:
+                with open("time.json", "r") as f:
+                    set_time = json.load(f)
+                set_time[time][device_id]=command
+                with open("time.json","w") as f:
+                    json.dump(set_time,f)
+            return "finish"
+        except Exception as e:
+            return str(e)
     #output all device name and their status
     def display_status(self):
         sum_status=""
